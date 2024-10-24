@@ -145,7 +145,6 @@ public class PaymentServiceImpl implements PaymentService {
         return "檢查碼驗證失敗";
     }
 
-    @Transactional
     @Override
     public void updatePaymentStatus(String id, PaymentStatus status) {
         paymentRepository.updateStatusById(id, status.getName());
