@@ -46,6 +46,24 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.getAllPayments());
     }
 
+    @Operation(summary = "查詢指定狀態的付款資料")
+    @GetMapping(value = "/payments/status/{status}")
+    public ResponseEntity<List<Payment>> getAllPaymentsByStatus(@PathVariable("status") PaymentStatus status) {
+        return ResponseEntity.ok(paymentService.getAllPaymentsByStatus(status.getName()));
+    }
+
+    @Operation(summary = "查詢指定付款方式的付款資料")
+    @GetMapping(value = "/payments/type/{type}")
+    public ResponseEntity<List<Payment>> getAllPaymentsByType(@PathVariable("type") String type) {
+        return ResponseEntity.ok(paymentService.getAllPaymentsByType(type));
+    }
+
+    @Operation(summary = "查詢指定商品編號的付款資料")
+    @GetMapping(value = "/payments/order/{orderId}")
+    public ResponseEntity<Payment> getPaymentByOrderId(@PathVariable("orderId") String orderId) {
+        return ResponseEntity.ok(paymentService.getPaymentByOrderId(orderId));
+    }
+
     @Operation(summary = "更新付款狀態")
     @PutMapping(value = "/payments/{id}")
     public ResponseEntity<String> updatePaymentStatus(@PathVariable("id") String id, @RequestParam("status") PaymentStatus status) {
