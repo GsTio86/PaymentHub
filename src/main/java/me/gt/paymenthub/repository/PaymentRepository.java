@@ -10,11 +10,10 @@ import java.util.List;
 public interface PaymentRepository extends JpaRepository<Payment, String> {
 
     List<Payment> findByOrderId(String orderId);
-
     List<Payment> findByType(String type);
     List<Payment> findByStatus(String status);
 
     @Modifying
-    @Query(value = "update Payment p set p.type = ?2 where p.id = ?1")
+    @Query(value = "update Payment p set p.status = ?2 where p.id = ?1")
     void updateStatusById(String id, String status);
 }
