@@ -1,5 +1,6 @@
 package me.gt.paymenthub.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import ecpay.payment.integration.AllInOne;
 import ecpay.payment.integration.domain.QueryTradeInfoObj;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +35,7 @@ public class PaymentController {
         String tradeInfo = aio.queryTradeInfo(queryTradeInfoObj);
         try {
             return ResponseEntity.ok(StringUtils.ecpayTradeInfoFormatJson(tradeInfo));
-        } catch (JSONException e) {
+        } catch (JsonProcessingException e) {
             return ResponseEntity.badRequest().body("錯誤|" + e.getMessage());
         }
     }
