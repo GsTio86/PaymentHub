@@ -14,6 +14,6 @@ public interface PaymentRepository extends JpaRepository<Payment, String> {
     List<Payment> findByStatus(String status);
 
     @Modifying
-    @Query(value = "update Payment p set p.status = ?2 where p.id = ?1")
-    void updateStatusById(String id, String status);
+    @Query(value = "update Payment p set p.status = ?2, p.updatedAt = ?3 where p.id = ?1")
+    void updateStatusById(String id, String status, String updatedAt);
 }

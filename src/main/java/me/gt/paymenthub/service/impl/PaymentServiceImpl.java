@@ -9,6 +9,7 @@ import me.gt.paymenthub.entity.Order;
 import me.gt.paymenthub.repository.PaymentRepository;
 import me.gt.paymenthub.entity.Payment;
 import me.gt.paymenthub.service.PaymentService;
+import me.gt.paymenthub.util.DateUtils;
 import me.gt.paymenthub.util.IdUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -147,7 +148,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void updatePaymentStatus(String id, PaymentStatus status) {
-        paymentRepository.updateStatusById(id, status.getName());
+        paymentRepository.updateStatusById(id, status.getName(), DateUtils.getCurrentTime());
     }
 
     @Override
