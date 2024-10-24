@@ -17,9 +17,9 @@ public interface PaymentService {
 
     List<Payment> getAllPayments();
 
-    List<Payment> findAllPaymentsByType(String type);
+    List<Payment> getAllPaymentsByType(String type);
 
-    List<Payment> findAllPaymentsByStatus(String status);
+    List<Payment> getAllPaymentsByStatus(String status);
 
     String processEcpayPaymentResult(Hashtable<String, String> result);
 

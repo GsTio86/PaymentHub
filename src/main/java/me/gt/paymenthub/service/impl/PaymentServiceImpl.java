@@ -92,12 +92,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<Payment> findAllPaymentsByType(String type) {
+    public List<Payment> getAllPaymentsByType(String type) {
         return paymentRepository.findByType(type);
     }
 
     @Override
-    public List<Payment> findAllPaymentsByStatus(String status) {
+    public List<Payment> getAllPaymentsByStatus(String status) {
         return paymentRepository.findByStatus(status);
     }
 
@@ -145,12 +145,9 @@ public class PaymentServiceImpl implements PaymentService {
         return "檢查碼驗證失敗";
     }
 
+    @Transactional
     @Override
     public void updatePaymentStatus(String id, PaymentStatus status) {
-        Payment payment = getPaymentById(id);
-        if (payment == null) {
-            return;
-        }
         paymentRepository.updateStatusById(id, status.getName());
     }
 
