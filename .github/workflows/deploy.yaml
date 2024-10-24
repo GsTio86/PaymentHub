@@ -1,28 +1,61 @@
-name: Build and deploy the application to Koyeb
+name: Deploy Spring Boot to Koyeb
 
 on:
-  schedule:
-    - cron: '55 8 * * *'
   push:
     branches:
-      - '*'
+      - main  # 每次推送到 main 分支時觸發
 
 jobs:
-  deploy:
-    concurrency:
-      group: "${{ github.ref_name }}"
-      cancel-in-progress: true
+  build:
     runs-on: ubuntu-latest
-    steps:
-      - name: Install and configure the Koyeb CLI
-        uses: koyeb-community/koyeb-actions@v2
-        with:
-          api_token: "${{ secrets.KOYEB_EXAMPLES_APPS_TOKEN }}"
 
-      - name: Build and deploy the application
-        uses: koyeb/action-git-deploy@v1
-        with:
-          app-name: spring-boot-${{ github.ref_name }}
-          service-ports: "8000:http"
-          service-routes: "/:8000"
-          skip-cache: true
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Cache Gradle packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Build Spring Boot Application
+      run: ./gradlew clean build --no-daemon
+
+    - name: Create Koyeb Deployment
+      env:
+        KOYEB_API_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
+      run: |
+        # 登入 Koyeb 並準備部署應用
+        curl -X POST \
+          -H "Authorization: Bearer $KOYEB_API_TOKEN" \
+          -H "Content-Type: application/json" \
+          -d '{
+                "service": {
+                  "name": "paymenthub",
+                  "regions": ["europe-west1"], 
+                  "docker": {
+                    "image": "eclipse-temurin:17-jdk-slim",
+                    "cmd": [
+                      "java", "-jar", "build/libs/paymenthub-0.0.1-SNAPSHOT.jar"
+                    ],
+                    "env": {
+                      "SPRING_PROFILES_ACTIVE": "prod",
+                      "DATABASE_URL": "${{ secrets.DATABASE_URL }}",
+                      "DB_USERNAME": "${{ secrets.DB_USERNAME }}",
+                      "DB_PASSWORD": "${{ secrets.DB_PASSWORD }}"
+                    },
+                    "expose_ports": [8080]
+                  },
+                  "plan": "hobby"
+                }
+              }' \
+          https://api.koyeb.com/v1/services
