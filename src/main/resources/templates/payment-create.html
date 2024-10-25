@@ -66,6 +66,15 @@
                 totalAmount: $('#totalAmount').val(),
                 paymentType: $('#paymentType').val()
             };
+
+            Swal.fire({
+                title: '處理中...',
+                text: '請稍候',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             
             $.ajax({
                 url: '/checkout/ecpay',
@@ -78,6 +87,7 @@
                         text: '手動付款已成功建立。',
                         icon: 'success'
                     })
+                    Swal.close();
                     document.open();
                     document.write(res);
                     document.close();
