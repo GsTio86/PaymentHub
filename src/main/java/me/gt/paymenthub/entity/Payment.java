@@ -4,11 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import me.gt.paymenthub.constant.PaymentStatus;
-import me.gt.paymenthub.constant.PaymentType;
 import me.gt.paymenthub.util.DateUtils;
 import org.hibernate.annotations.Comment;
-
-import java.time.LocalDateTime;
 
 @Data
 @Builder

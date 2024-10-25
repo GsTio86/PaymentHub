@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>付款資料管理後台 - 管理付款資料</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" >
+</head>
+<body>
+    <div class="container mt-5 table-responsive">
+        <h2 class="display-5">付款管理</h2>
+        <a href="/" class="btn btn-outline-primary mt-3">返回首頁</a><br>
+        <div class="card mt-4">
+            <table class="table table-hover mt-3">
+                <tr>
+                    <th>付款編號</th>
+                    <th>付款金額</th>
+                    <th>付款方式</th>
+                    <th>付款狀態</th>
+                    <th>訂單編號</th>
+                    <th>建立時間</th>
+                    <th>更新時間</th>
+                    <th>操作</th>
+                </tr>
+                <tr th:if="!${payments.isEmpty()}" th:each="payment: ${payments}">
+                    <td th:text="${payment.id}"/>
+                    <td th:text="${payment.amount}"/>
+                    <td th:text="${payment.type}"/>
+                    <td>
+                        <select class="form-select" th:attr="id='status-' + ${payment.id}">
+                            <option value="PENDING" th:selected="${payment.status == '待付款'}">待付款</option>
+                            <option value="CHECKING" th:selected="${payment.status == '待確認'}">待確認</option>
+                            <option value="SIMULATING"th:selected="${payment.status == '模擬付款'}">模擬付款</option>
+                            <option value="REFUND" th:selected="${payment.status == '已退款'}">已退款</option>
+                            <option value="COMPLETED" th:selected="${payment.status == '已付款'}">已付款</option>
+                            <option value="FAILED"  th:selected="${payment.status == '付款失敗'}">付款失敗</option>
+                        </select>
+                    </td>
+                    <td th:text="${payment.orderId}"/>
+                    <td th:text="${payment.createdAt}"/>
+                    <td th:text="${payment.updatedAt}"/>
+                    <td>
+                        <button class="btn btn-outline-primary" th:onclick="updatePayment([[${payment.id}]]);">
+                            <i class="bi bi-floppy-fill"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" th:onclick="deletePayment([[${payment.id}]]);">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr th:if="${payments.isEmpty()}">
+                    <td colspan="8" class="text-center">沒有資料</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function updatePayment(id) {
+            const status = document.getElementById(`status-${id}`).value;
+            $.ajax({
+                url: `/payment/payments/${id}`,
+                type: 'PUT',
+                data: { status: status },
+                success: function(res) {
+                    Swal.fire({
+                        title: '更新成功!',
+                        text: '付款資料更新成功',
+                        icon: 'success'
+                    }).then((result) => {
+                        location.reload();
+                    })
+                },
+                error: function(err) {
+                    Swal.fire({
+                        title: '更新失敗!',
+                        text: `${err.responseText}`,
+                        icon: 'error'
+                    });
+                }
+            });
+
+        }
+
+        function deletePayment(id) {
+            $.ajax({
+                url: `/payment/payments/${id}`,
+                type: 'DELETE',
+                success: function(res) {
+                    Swal.fire({
+                        title: '刪除成功!',
+                        text: '付款資料刪除成功',
+                        icon: 'success'
+                    }).then((result) => {
+                        location.reload();
+                    })
+                },
+                error: function(err) {
+                    Swal.fire({
+                        title: '刪除失敗!',
+                        text: `${err.responseText}`,
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

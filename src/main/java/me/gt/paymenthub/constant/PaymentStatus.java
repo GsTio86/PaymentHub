@@ -4,8 +4,8 @@ public enum PaymentStatus {
     PENDING("待付款"),
     CHECKING("待確認"),
     SIMULATING("模擬付款"),
-    COMPLETED("已付款"),
     REFUND("已退款"),
+    COMPLETED("已付款"),
     FAILED("付款失敗");
 
     String name;

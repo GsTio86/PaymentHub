@@ -21,10 +21,12 @@ public interface PaymentService {
 
     List<Payment> getAllPaymentsByStatus(String status);
 
-    String processEcpayPaymentResult(Hashtable<String, String> result);
+    EcpayResult processEcpayPaymentResult(Hashtable<String, String> result);
 
     void updatePaymentStatus(String id, PaymentStatus status);
 
     void deletePayment(String id);
+
+    record EcpayResult(long statusCode, String message) {}
 
 }

@@ -12,6 +12,7 @@ import me.gt.paymenthub.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -39,6 +40,18 @@ public class PaymentController {
         }
     }
 
+    @GetMapping("/create")
+    public ModelAndView createPaymentPage() {
+        return new ModelAndView("payment-create");
+    }
+
+    @GetMapping
+    public ModelAndView getPaymentPage() {
+        ModelAndView model = new ModelAndView("payment-manage");
+        model.addObject("payments", paymentService.getAllPayments());
+        return model;
+    }
+
     @Operation(summary = "查詢所有付款資料")
     @GetMapping(value = "/payments")
     public ResponseEntity<List<Payment>> getAllPayments() {
@@ -63,18 +76,26 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.getPaymentByOrderId(orderId));
     }
 
-    @Operation(summary = "更新付款狀態")
+    @Operation(summary = "更新付款資料狀態")
     @PutMapping(value = "/payments/{id}")
     public ResponseEntity<String> updatePaymentStatus(@PathVariable("id") String id, @RequestParam("status") PaymentStatus status) {
-        paymentService.updatePaymentStatus(id, status);
-        return ResponseEntity.ok("付款狀態更新成功");
+        try {
+            paymentService.updatePaymentStatus(id, status);
+            return ResponseEntity.ok("付款資料更新成功");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("錯誤|" + e.getMessage());
+        }
     }
 
     @Operation(summary = "刪除付款資料")
     @DeleteMapping(value = "/payments/{id}")
     public ResponseEntity<String> deletePayment(@PathVariable("id") String id) {
-        paymentService.deletePayment(id);
-        return ResponseEntity.ok("付款資料刪除成功");
+        try {
+            paymentService.deletePayment(id);
+            return ResponseEntity.ok("付款資料刪除成功");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("錯誤|" + e.getMessage());
+        }
     }
 
 

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>付款資料管理後台 - 手動建立付款表單</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" >
+</head>
+<body>
+    <div class="container mt-5 table-responsive">
+        <h2 class="display-5">建立付款</h2>
+        <a href="/" class="btn btn-outline-primary mt-3">返回首頁</a><br>
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>手動建立付款</h5>
+            </div>
+            <div class="card-body">
+                <form id="orderForm">
+                    <div class="mb-3">
+                        <label for="orderId" class="form-label">訂單編號</label>
+                        <input type="text" class="form-control" id="orderId" name="orderId" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tradeDesc" class="form-label">交易描述</label>
+                        <input type="text" class="form-control" id="tradeDesc" name="tradeDesc" required>
+                    </div>                    
+                    <div class="mb-3">
+                        <label for="itemName" class="form-label">商品名稱</label>
+                        <input type="text" class="form-control" id="itemName" name="itemName" placeholder="商品名稱" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="totalAmount" class="form-label">金額</label>
+                        <input type="number" class="form-control" id="totalAmount" name="totalAmount" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="paymentType" class="form-label">付款方式</label>
+                        <select class="form-select" id="paymentType" name="paymentType" required>
+                            <option value="ALL">全部</option>
+                            <option value="CREDIT">信用卡</option>
+                            <option value="WEBATM">網路轉帳</option>
+                            <option value="ATM">ATM 轉帳</option>
+                            <option value="CVS">超商代碼</option>
+                            <option value="BARCODE">超商條碼</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success">建立付款</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#orderForm').submit(function(e) {
+            e.preventDefault();
+            submitForm();
+        });
+
+        function submitForm() {
+            const data = {
+                orderId: $('#orderId').val(),
+                itemName: $('#itemName').val(),
+                tradeDesc: $('#tradeDesc').val(),
+                totalAmount: $('#totalAmount').val(),
+                paymentType: $('#paymentType').val()
+            };
+            
+            $.ajax({
+                url: '/checkout/ecpay',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(res) {
+                    Swal.fire({
+                        title: '付款建立成功!',
+                        text: '手動付款已成功建立。',
+                        icon: 'success'
+                    })
+                    document.open();
+                    document.write(res);
+                    document.close();
+                },
+                error: function(err) {
+                    Swal.fire({
+                        title: '建立失敗!',
+                        text: `${err.responseText}`,
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

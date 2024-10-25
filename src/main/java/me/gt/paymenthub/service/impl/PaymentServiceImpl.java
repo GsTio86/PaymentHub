@@ -53,6 +53,9 @@ public class PaymentServiceImpl implements PaymentService {
         obj.setItemName(order.getItemName());
         obj.setTotalAmount(String.valueOf(payment.getAmount()));
 
+        // 預設將自訂欄位1設為訂單編號 (用於廠商後台查詢)
+        obj.setCustomField1(order.getOrderId());
+
         PaymentType paymentType = order.getPaymentType();
         if (paymentType != PaymentType.ALL) {
             obj.setChoosePayment(paymentType.getId());
@@ -104,7 +107,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public String processEcpayPaymentResult(Hashtable<String, String> result) {
+    public EcpayResult processEcpayPaymentResult(Hashtable<String, String> result) {
         AllInOne aio = new AllInOne("");
         boolean valid = aio.compareCheckMacValue(result); // 確認檢查碼是否正確
         if (valid) {
@@ -128,29 +131,32 @@ public class PaymentServiceImpl implements PaymentService {
                 case 1 -> {  // 付款成功
                     if (simulatePaid) {
                         updatePaymentStatus(merchantTradeNo, PaymentStatus.SIMULATING);
+                        return new EcpayResult(001, "模擬付款成功");
                     } else {
                         updatePaymentStatus(merchantTradeNo, PaymentStatus.COMPLETED);
+                        return new EcpayResult(002, "付款成功");
                     }
-                    return "OK";
                 }
                 case 10300066 -> { // 付款待確認
                     updatePaymentStatus(merchantTradeNo, PaymentStatus.CHECKING);
-                    return "付款待確認";
+                    return new EcpayResult(003, "付款待確認");
                 }
                 default -> { // 付款失敗
                     updatePaymentStatus(merchantTradeNo, PaymentStatus.FAILED);
-                    return rtnMsg;
+                    return new EcpayResult(004, rtnMsg);
                 }
             }
         }
-        return "檢查碼驗證失敗";
+        return new EcpayResult(005,"檢查碼驗證失敗");
     }
 
+    @Transactional
     @Override
     public void updatePaymentStatus(String id, PaymentStatus status) {
         paymentRepository.updateStatusById(id, status.getName(), DateUtils.getCurrentTime());
     }
 
+    @Transactional
     @Override
     public void deletePayment(String id) {
         paymentRepository.deleteById(id);
