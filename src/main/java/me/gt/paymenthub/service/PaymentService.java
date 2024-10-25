@@ -1,8 +1,10 @@
 package me.gt.paymenthub.service;
 
 import me.gt.paymenthub.constant.PaymentStatus;
+import me.gt.paymenthub.dto.PaymentSearchDTO;
 import me.gt.paymenthub.entity.Order;
 import me.gt.paymenthub.entity.Payment;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Hashtable;
 import java.util.List;
@@ -15,11 +17,15 @@ public interface PaymentService {
 
     Payment getPaymentByOrderId(String orderId);
 
-    List<Payment> getAllPayments();
+    List<Payment> getPayments();
 
-    List<Payment> getAllPaymentsByType(String type);
+    List<Payment> getPaymentsByType(String type);
 
-    List<Payment> getAllPaymentsByStatus(String status);
+    List<Payment> getPaymentsByStatus(String status);
+
+    List<Payment> getPaymentsByOrderIdStatusAndType(PaymentSearchDTO searchDTO);
+
+    Specification<Payment> getPaymentsSpec(PaymentSearchDTO searchDTO);
 
     EcpayResult processEcpayPaymentResult(Hashtable<String, String> result);
 

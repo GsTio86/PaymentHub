@@ -3,8 +3,10 @@ package me.gt.paymenthub.service.impl;
 import ecpay.payment.integration.AllInOne;
 import ecpay.payment.integration.domain.AioCheckOutALL;
 import ecpay.payment.integration.exception.EcpayException;
+import jakarta.persistence.criteria.Predicate;
 import me.gt.paymenthub.constant.PaymentStatus;
 import me.gt.paymenthub.constant.PaymentType;
+import me.gt.paymenthub.dto.PaymentSearchDTO;
 import me.gt.paymenthub.entity.Order;
 import me.gt.paymenthub.repository.PaymentRepository;
 import me.gt.paymenthub.entity.Payment;
@@ -13,11 +15,11 @@ import me.gt.paymenthub.util.DateUtils;
 import me.gt.paymenthub.util.IdUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Hashtable;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -91,18 +93,42 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public List<Payment> getAllPayments() {
+    public List<Payment> getPayments() {
         return paymentRepository.findAll();
     }
 
     @Override
-    public List<Payment> getAllPaymentsByType(String type) {
+    public List<Payment> getPaymentsByType(String type) {
         return paymentRepository.findByType(type);
     }
 
     @Override
-    public List<Payment> getAllPaymentsByStatus(String status) {
+    public List<Payment> getPaymentsByStatus(String status) {
         return paymentRepository.findByStatus(status);
+    }
+
+    @Override
+    public Specification<Payment> getPaymentsSpec(PaymentSearchDTO searchDTO) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            Optional.ofNullable(searchDTO.getPaymentId())
+                    .filter(id -> !id.isEmpty())
+                    .ifPresent(id -> predicates.add(criteriaBuilder.like(root.get("id"), id)));
+            Optional.ofNullable(searchDTO.getOrderId())
+                    .filter(id -> !id.isEmpty())
+                    .ifPresent(id -> predicates.add(criteriaBuilder.like(root.get("orderId"), id)));
+            Optional.ofNullable(searchDTO.getStatus())
+                    .ifPresent(status -> predicates.add(criteriaBuilder.equal(root.get("status"), status.getName())));
+            Optional.ofNullable(searchDTO.getType())
+                    .filter(type -> !type.isEmpty())
+                    .ifPresent(type -> predicates.add(criteriaBuilder.equal(root.get("type"), type)));
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    @Override
+    public List<Payment> getPaymentsByOrderIdStatusAndType(PaymentSearchDTO searchDTO) {
+        return paymentRepository.findAll(getPaymentsSpec(searchDTO));
     }
 
     @Transactional

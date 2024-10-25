@@ -6,6 +6,7 @@ import ecpay.payment.integration.domain.QueryTradeInfoObj;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import me.gt.paymenthub.constant.PaymentStatus;
+import me.gt.paymenthub.dto.PaymentSearchDTO;
 import me.gt.paymenthub.entity.Payment;
 import me.gt.paymenthub.service.PaymentService;
 import me.gt.paymenthub.util.StringUtils;
@@ -48,32 +49,43 @@ public class PaymentController {
     @GetMapping
     public ModelAndView getPaymentPage() {
         ModelAndView model = new ModelAndView("payment-manage");
-        model.addObject("payments", paymentService.getAllPayments());
+        model.addObject("payments", paymentService.getPayments());
         return model;
     }
 
     @Operation(summary = "查詢所有付款資料")
     @GetMapping(value = "/payments")
     public ResponseEntity<List<Payment>> getAllPayments() {
-        return ResponseEntity.ok(paymentService.getAllPayments());
+        return ResponseEntity.ok(paymentService.getPayments());
     }
 
     @Operation(summary = "查詢指定狀態的付款資料")
     @GetMapping(value = "/payments/status/{status}")
     public ResponseEntity<List<Payment>> getAllPaymentsByStatus(@PathVariable("status") PaymentStatus status) {
-        return ResponseEntity.ok(paymentService.getAllPaymentsByStatus(status.getName()));
+        return ResponseEntity.ok(paymentService.getPaymentsByStatus(status.getName()));
     }
 
     @Operation(summary = "查詢指定付款方式的付款資料")
     @GetMapping(value = "/payments/type/{type}")
     public ResponseEntity<List<Payment>> getAllPaymentsByType(@PathVariable("type") String type) {
-        return ResponseEntity.ok(paymentService.getAllPaymentsByType(type));
+        return ResponseEntity.ok(paymentService.getPaymentsByType(type));
     }
 
     @Operation(summary = "查詢指定商品編號的付款資料")
     @GetMapping(value = "/payments/order/{orderId}")
     public ResponseEntity<Payment> getPaymentByOrderId(@PathVariable("orderId") String orderId) {
         return ResponseEntity.ok(paymentService.getPaymentByOrderId(orderId));
+    }
+
+    @Operation(summary = "查詢指定條件的付款資料")
+    @GetMapping(value = "/payments/search")
+    public ResponseEntity<List<Payment>> searchPayments(
+            @RequestParam(value = "paymentId", required = false) String paymentId,
+            @RequestParam(value = "orderId", required = false) String orderId,
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "status", required = false) PaymentStatus status) {
+        PaymentSearchDTO searchDTO = new PaymentSearchDTO(paymentId, orderId, type, status);
+        return ResponseEntity.ok(paymentService.getPaymentsByOrderIdStatusAndType(searchDTO));
     }
 
     @Operation(summary = "更新付款資料狀態")
@@ -97,6 +109,5 @@ public class PaymentController {
             return ResponseEntity.badRequest().body("錯誤|" + e.getMessage());
         }
     }
-
 
 }

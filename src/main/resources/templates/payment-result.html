@@ -44,7 +44,6 @@
         const orderId = /*[[${orderId}]]*/ '未提供'; // 訂單編號
         const paymentId = /*[[${paymentId}]]*/ '未提供'; // 付款編號
 
-        console.log('statusCode:', statusCode);
         if (Number(statusCode) === 1 || Number(statusCode) === 2) {
             Swal.fire({
                 title: '<strong>付款成功!</strong>',

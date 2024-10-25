@@ -36,8 +36,8 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    public void getAllPaymentsTest() {
-        List<Payment> payments = service.getAllPayments();
+    public void getPaymentsTest() {
+        List<Payment> payments = service.getPayments();
         if (payments != null) {
             for (Payment payment : payments) {
                 System.out.println("付款資料: " + payment);
@@ -48,8 +48,8 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    public void getAllPaymentsByStatusTest() {
-        List<Payment> payments = service.getAllPaymentsByStatus("待付款");
+    public void getPaymentsByStatusTest() {
+        List<Payment> payments = service.getPaymentsByStatus("待付款");
         if (payments != null) {
             for (Payment payment : payments) {
                 System.out.println("付款資料: " + payment);
@@ -60,8 +60,8 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    public void getAllPaymentsByTypeTest() {
-        List<Payment> payments = service.getAllPaymentsByType("超商代碼");
+    public void getPaymentsByTypeTest() {
+        List<Payment> payments = service.getPaymentsByType("超商代碼");
         if (payments != null) {
             for (Payment payment : payments) {
                 System.out.println("付款資料: " + payment);
