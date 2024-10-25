@@ -32,7 +32,7 @@ public class ResultController {
         }
     }
 
-    @PostMapping(value = "/ecpay/clientResult", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.TEXT_HTML_VALUE)
+    @PostMapping(value = "/ecpay/order", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.TEXT_HTML_VALUE)
     public ModelAndView ecpayClientPaymentResult(@RequestParam Map<String, String> paymentResult) {
         PaymentService.EcpayResult ecpayResult = paymentService.processEcpayPaymentResult(new Hashtable(paymentResult));
         ModelAndView model = new ModelAndView("payment-result");
