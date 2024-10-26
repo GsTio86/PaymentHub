@@ -1,8 +1,7 @@
-FROM ibm-semeru-runtimes:open-17-jre-focal
+FROM eclipse-temurin:17-jdk-alpine
 
-WORKDIR /home/app
+WORKDIR /app
 
-ADD ./build//libs/*.jar ./app.jar
+COPY ./build/libs/PaymentHub-0.0.1-SNAPSHOT.jar ./app.jar
 
-EXPOSE 8080
-CMD java $JAVA_OPTS -Dspring.profiles.active=$PROFILE -jar app.jar
+ENTRYPOINT ["java", "-jar", "./app.jar"]
